@@ -15,37 +15,22 @@ function initializeMatrix() {
 function printMatrix() {
     console.table(matrix);
 }
-
 function checkFormation() {
     let score = 0;
 
     for (let i = 0; i < SIZE; i++) {
         for (let j = 0; j < SIZE; j++) {
-            if (j <= SIZE - 3 && matrix[i][j] === matrix[i][j + 1] && matrix[i][j] === matrix[i][j + 2]) {
-                score += 5;
-                clearCandies(i, j, 0, 3);
-            }
-            if (j <= SIZE - 4 && matrix[i][j] === matrix[i][j + 1] && matrix[i][j] === matrix[i][j + 2] && matrix[i][j] === matrix[i][j + 3]) {
-                score += 10;
-                clearCandies(i, j, 0, 4);
-            }
+
             if (j <= SIZE - 5 && matrix[i][j] === matrix[i][j + 1] && matrix[i][j] === matrix[i][j + 2] && matrix[i][j] === matrix[i][j + 3] && matrix[i][j] === matrix[i][j + 4]) {
                 score += 50;
                 clearCandies(i, j, 0, 5);
-            }
-            if (i <= SIZE - 3 && matrix[i][j] === matrix[i + 1][j] && matrix[i][j] === matrix[i + 2][j]) {
-                score += 5;
-                clearCandies(i, j, 1, 3);
-            }
-            if (i <= SIZE - 4 && matrix[i][j] === matrix[i + 1][j] && matrix[i][j] === matrix[i + 2][j] && matrix[i][j] === matrix[i + 3][j]) {
-                score += 10;
-                clearCandies(i, j, 1, 4);
             }
             if (i <= SIZE - 5 && matrix[i][j] === matrix[i + 1][j] && matrix[i][j] === matrix[i + 2][j] && matrix[i][j] === matrix[i + 3][j] && matrix[i][j] === matrix[i + 4][j]) {
                 score += 50;
                 clearCandies(i, j, 1, 5);
             }
 
+    
             if (i <= SIZE - 3 && j <= SIZE - 2 && matrix[i][j] === matrix[i + 1][j] && matrix[i][j] === matrix[i + 2][j] && matrix[i][j] === matrix[i][j + 1]) {
                 score += 15;
                 clearCandies(i, j, 2);
@@ -62,7 +47,6 @@ function checkFormation() {
                 score += 15;
                 clearCandies(i, j, 2);
             }
-
             if (i <= SIZE - 2 && j <= SIZE - 3 && matrix[i][j] === matrix[i][j + 1] && matrix[i][j] === matrix[i][j + 2] && matrix[i][j] === matrix[i + 1][j + 1]) {
                 score += 15;
                 clearCandies(i, j, 2);
@@ -71,10 +55,29 @@ function checkFormation() {
                 score += 15;
                 clearCandies(i, j, 2);
             }
+
+            if (j <= SIZE - 4 && matrix[i][j] === matrix[i][j + 1] && matrix[i][j] === matrix[i][j + 2] && matrix[i][j] === matrix[i][j + 3]) {
+                score += 10;
+                clearCandies(i, j, 0, 4);
+            }
+            if (i <= SIZE - 4 && matrix[i][j] === matrix[i + 1][j] && matrix[i][j] === matrix[i + 2][j] && matrix[i][j] === matrix[i + 3][j]) {
+                score += 10;
+                clearCandies(i, j, 1, 4);
+            }
+
+            if (j <= SIZE - 3 && matrix[i][j] === matrix[i][j + 1] && matrix[i][j] === matrix[i][j + 2]) {
+                score += 5;
+                clearCandies(i, j, 0, 3);
+            }
+            if (i <= SIZE - 3 && matrix[i][j] === matrix[i + 1][j] && matrix[i][j] === matrix[i + 2][j]) {
+                score += 5;
+                clearCandies(i, j, 1, 3);
+            }
         }
     }
     return score;
 }
+
 
 function clearCandies(row, col, direction, length = 3) {
     if (direction === 0) {
