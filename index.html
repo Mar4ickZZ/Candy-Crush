@@ -2,14 +2,19 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Candy Crush</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Candy Crush Game</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <h1>Candy Crush</h1>
-    <button onclick="startGame()">Start Jocuri</button>
-    <div class="result-container">
-        <p id="result">Apasă butonul pentru a începe jocurile.</p>
+    <div class="game-container">
+        <div class="header">
+            <h1 class="title">Candy Crush</h1>
+            <button class="start-game-button" onclick="startGame()">Start Jocuri</button>
+        </div>
+        <div class="result-panel">
+            <p id="result">Apasă buttonul pentru a începe jocurile!</p>
+        </div>
     </div>
     <script src="main.js"></script>
 </body>
