@@ -15,99 +15,73 @@ function initializeMatrix() {
 function printMatrix() {
     console.table(matrix);
 }
+
 function checkFormation() {
     let score = 0;
+    const toClear = [];
 
     for (let i = 0; i < SIZE; i++) {
         for (let j = 0; j < SIZE; j++) {
-
-            if (j <= SIZE - 5 && matrix[i][j] === matrix[i][j + 1] && matrix[i][j] === matrix[i][j + 2] && matrix[i][j] === matrix[i][j + 3] && matrix[i][j] === matrix[i][j + 4]) {
-                score += 50;
-                clearCandies(i, j, 0, 5);
-            }
-            if (i <= SIZE - 5 && matrix[i][j] === matrix[i + 1][j] && matrix[i][j] === matrix[i + 2][j] && matrix[i][j] === matrix[i + 3][j] && matrix[i][j] === matrix[i + 4][j]) {
-                score += 50;
-                clearCandies(i, j, 1, 5);
-            }
-
-    
-            if (i <= SIZE - 3 && j <= SIZE - 2 && matrix[i][j] === matrix[i + 1][j] && matrix[i][j] === matrix[i + 2][j] && matrix[i][j] === matrix[i][j + 1]) {
-                score += 15;
-                clearCandies(i, j, 2);
-            }
-            if (i <= SIZE - 3 && j >= 1 && matrix[i][j] === matrix[i + 1][j] && matrix[i][j] === matrix[i + 2][j] && matrix[i][j] === matrix[i][j - 1]) {
-                score += 15;
-                clearCandies(i, j, 2);
-            }
-            if (i >= 2 && j <= SIZE - 2 && matrix[i][j] === matrix[i - 1][j] && matrix[i][j] === matrix[i - 2][j] && matrix[i][j] === matrix[i][j + 1]) {
-                score += 15;
-                clearCandies(i, j, 2);
-            }
-            if (i >= 2 && j >= 1 && matrix[i][j] === matrix[i - 1][j] && matrix[i][j] === matrix[i - 2][j] && matrix[i][j] === matrix[i][j - 1]) {
-                score += 15;
-                clearCandies(i, j, 2);
-            }
-            if (i <= SIZE - 2 && j <= SIZE - 3 && matrix[i][j] === matrix[i][j + 1] && matrix[i][j] === matrix[i][j + 2] && matrix[i][j] === matrix[i + 1][j + 1]) {
-                score += 15;
-                clearCandies(i, j, 2);
-            }
-            if (i >= 1 && j <= SIZE - 3 && matrix[i][j] === matrix[i][j + 1] && matrix[i][j] === matrix[i][j + 2] && matrix[i][j] === matrix[i - 1][j + 1]) {
-                score += 15;
-                clearCandies(i, j, 2);
-            }
-
-            if (j <= SIZE - 4 && matrix[i][j] === matrix[i][j + 1] && matrix[i][j] === matrix[i][j + 2] && matrix[i][j] === matrix[i][j + 3]) {
-                score += 10;
-                clearCandies(i, j, 0, 4);
-            }
-            if (i <= SIZE - 4 && matrix[i][j] === matrix[i + 1][j] && matrix[i][j] === matrix[i + 2][j] && matrix[i][j] === matrix[i + 3][j]) {
-                score += 10;
-                clearCandies(i, j, 1, 4);
-            }
-
-            if (j <= SIZE - 3 && matrix[i][j] === matrix[i][j + 1] && matrix[i][j] === matrix[i][j + 2]) {
-                score += 5;
-                clearCandies(i, j, 0, 3);
-            }
-            if (i <= SIZE - 3 && matrix[i][j] === matrix[i + 1][j] && matrix[i][j] === matrix[i + 2][j]) {
-                score += 5;
-                clearCandies(i, j, 1, 3);
-            }
+            score += checkMatch(i, j, 5, 'horizontal', toClear);
+            score += checkMatch(i, j, 5, 'vertical', toClear);
+            score += checkMatch(i, j, 4, 'horizontal', toClear);
+            score += checkMatch(i, j, 4, 'vertical', toClear);
+            score += checkMatch(i, j, 3, 'horizontal', toClear);
+            score += checkMatch(i, j, 3, 'vertical', toClear);
+            score += checkSpecialFormations(i, j, toClear);
         }
     }
+
+    toClear.forEach(([row, col]) => matrix[row][col] = EMPTY);
     return score;
 }
 
-
-function clearCandies(row, col, direction, length = 3) {
-    if (direction === 0) {
-        for (let j = col; j < col + length; j++) {
-            matrix[row][j] = EMPTY;
+function checkMatch(row, col, length, direction, toClear) {
+    if (direction === 'horizontal' && col <= SIZE - length) {
+        if (matrix[row].slice(col, col + length).every(cell => cell === matrix[row][col])) {
+            for (let j = col; j < col + length; j++) {
+                toClear.push([row, j]);
+            }
+            return length === 5 ? 50 : length === 4 ? 10 : 5;
         }
-    } else if (direction === 1) {
-        for (let i = row; i < row + length; i++) {
-            matrix[i][col] = EMPTY;
+    } else if (direction === 'vertical' && row <= SIZE - length) {
+        if (Array.from({ length }, (_, k) => matrix[row + k][col]).every(cell => cell === matrix[row][col])) {
+            for (let i = row; i < row + length; i++) {
+                toClear.push([i, col]);
+            }
+            return length === 5 ? 50 : length === 4 ? 10 : 5;
         }
-    } else if (direction === 2) {
-        matrix[row][col] = EMPTY;
-        if (matrix[row + 1] && matrix[row + 1][col] !== undefined) matrix[row + 1][col] = EMPTY;
-        if (matrix[row - 1] && matrix[row - 1][col] !== undefined) matrix[row - 1][col] = EMPTY;
-        if (matrix[row][col + 1] !== undefined) matrix[row][col + 1] = EMPTY;
-        if (matrix[row][col - 1] !== undefined) matrix[row][col - 1] = EMPTY;
     }
-    dropCandies();
+    return 0;
 }
 
+function checkSpecialFormations(row, col, toClear) {
+    let score = 0;
+    if (row <= SIZE - 3 && col <= SIZE - 2 && matrix[row][col] === matrix[row + 1][col] && matrix[row][col] === matrix[row + 2][col] && matrix[row][col] === matrix[row][col + 1]) {
+        toClear.push([row, col], [row + 1, col], [row + 2, col], [row, col + 1]);
+        score += 15;
+    }
+    if (row <= SIZE - 3 && col >= 1 && matrix[row][col] === matrix[row + 1][col] && matrix[row][col] === matrix[row + 2][col] && matrix[row][col] === matrix[row][col - 1]) {
+        toClear.push([row, col], [row + 1, col], [row + 2, col], [row, col - 1]);
+        score += 15;
+    }
+
+    return score;
+}
 
 function dropCandies() {
     for (let j = 0; j < SIZE; j++) {
+        let emptyCount = 0;
         for (let i = SIZE - 1; i >= 0; i--) {
             if (matrix[i][j] === EMPTY) {
-                for (let k = i; k > 0; k--) {
-                    matrix[k][j] = matrix[k - 1][j];
-                }
-                matrix[0][j] = generateRandomCandy();
+                emptyCount++;
+            } else if (emptyCount > 0) {
+                matrix[i + emptyCount][j] = matrix[i][j];
+                matrix[i][j] = EMPTY;
             }
+        }
+        for (let i = 0; i < emptyCount; i++) {
+            matrix[i][j] = generateRandomCandy();
         }
     }
 }
@@ -163,11 +137,11 @@ function startGame() {
         totalScore += result.score;
         totalSwaps += result.swaps;
 
-        console.log(`Игра ${i + 1}: Очки = ${result.score}, Количество попыток = ${result.swaps}`);
+        console.log(`Jocul ${i + 1}: Score = ${result.score}, Schimbări = ${result.swaps}`);
     }
 
     let averageScore = totalScore / games;
     let averageSwaps = totalSwaps / games;
 
-    document.getElementById("result").textContent = `Scor mediu: ${averageScore.toFixed(2)}, Schimbări medii: ${averageSwaps.toFixed(2)}`;
+    document.getElementById("result").textContent = `Medie score: ${averageScore.toFixed(2)}, Medie schimbări: ${averageSwaps.toFixed(2)}`;
 }
